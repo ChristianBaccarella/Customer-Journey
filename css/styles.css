@@ -92,6 +92,32 @@ a { color: var(--color-primary); text-decoration: none; }
   white-space: nowrap;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.unibz-logo-link {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border);
+  padding-right: 1.25rem;
+}
+
+.unibz-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .unibz-logo { height: 28px; }
+  .header-left { gap: 0.75rem; }
+  .unibz-logo-link { padding-right: 0.75rem; }
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -695,6 +721,23 @@ select { cursor: pointer; appearance: none;
   font-size: 0.85rem;
   border-top: 1px solid var(--color-border);
   margin-top: 2rem;
+}
+
+.footer-copyright {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  opacity: 0.8;
+}
+
+.footer-copyright a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-copyright a:hover {
+  color: var(--color-primary);
 }
 
 /* =====================================================

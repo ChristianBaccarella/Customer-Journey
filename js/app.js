@@ -446,3 +446,11 @@ window.addEventListener('resize', function() {
     }
   });
 })();
+
+/* =====================================================
+   COPYRIGHT YEAR
+   ===================================================== */
+(function() {
+  var el = document.getElementById('copyright-year');
+  if (el) el.textContent = new Date().getFullYear();
+})();
