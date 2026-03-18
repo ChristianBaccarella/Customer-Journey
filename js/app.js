@@ -289,7 +289,7 @@ function _detailRow(label, value) {
 function _improvementRow(value) {
   return `
     <div class="detail-row">
-      <span class="detail-label">Verbesserung</span>
+      <span class="detail-label">Strategische Optionen</span>
       <span class="detail-value improvement">${_escape(value)}</span>
     </div>`;
 }
