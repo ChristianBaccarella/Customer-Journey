@@ -373,3 +373,35 @@ window.addEventListener('resize', function() {
     }
   }, 200);
 });
+
+/* =====================================================
+   BRIEFING CARD TOGGLE
+   ===================================================== */
+(function initBriefingToggle() {
+  const header = document.getElementById('briefing-header');
+  const toggleBtn = document.getElementById('briefing-toggle');
+  const body = document.getElementById('briefing-body');
+
+  if (!header || !toggleBtn || !body) return;
+
+  function toggle() {
+    const isOpen = !body.classList.contains('hidden');
+    if (isOpen) {
+      body.classList.add('hidden');
+      toggleBtn.textContent = 'Einblenden';
+      header.setAttribute('aria-expanded', 'false');
+    } else {
+      body.classList.remove('hidden');
+      toggleBtn.textContent = 'Ausblenden';
+      header.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  header.addEventListener('click', toggle);
+  header.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+})();
