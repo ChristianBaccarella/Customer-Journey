@@ -159,20 +159,12 @@ a { color: var(--color-primary); text-decoration: none; }
    MAIN LAYOUT
    ===================================================== */
 .main-layout {
-  max-width: 1400px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 2.5rem;
-}
-
-/* On wide screens: form left, viz right */
-@media (min-width: 1100px) {
-  .main-layout {
-    grid-template-columns: 480px 1fr;
-    align-items: start;
-  }
 }
 
 /* =====================================================
@@ -417,6 +409,9 @@ select { cursor: pointer; appearance: none;
   flex-direction: column;
   gap: 2rem;
   animation: fadeSlideIn 0.5s ease both;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 @keyframes fadeSlideIn {
@@ -703,6 +698,125 @@ select { cursor: pointer; appearance: none;
 }
 
 /* =====================================================
+   BRIEFING / STORY CARD
+   ===================================================== */
+.briefing-card {
+  background: linear-gradient(135deg, #1a4f7a 0%, #1b6b4a 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  color: #fff;
+}
+
+.briefing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.75rem;
+  cursor: pointer;
+  user-select: none;
+  gap: 1rem;
+}
+
+.briefing-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.briefing-emoji {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.briefing-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.briefing-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.75);
+  margin-top: 0.15rem;
+}
+
+.briefing-toggle-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+
+.briefing-toggle-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.briefing-body {
+  padding: 0 1.75rem 1.75rem;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.briefing-body.hidden {
+  display: none !important;
+}
+
+.briefing-body p {
+  margin: 0.85rem 0 0;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.65;
+}
+
+.briefing-body strong {
+  color: #fff;
+}
+
+.briefing-body em {
+  color: rgba(255,255,255,0.85);
+  font-style: italic;
+}
+
+.briefing-task-box {
+  margin-top: 1.25rem;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.briefing-task-box p {
+  margin: 0;
+}
+
+.briefing-hints {
+  margin-top: 1.25rem;
+}
+
+.briefing-hints p {
+  margin-bottom: 0.4rem;
+}
+
+.briefing-hints ul {
+  margin: 0.4rem 0 0 1.25rem;
+  padding: 0;
+}
+
+.briefing-hints ul li {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.88);
+  margin-bottom: 0.35rem;
+  line-height: 1.5;
+}
+
+/* =====================================================
    PRINT STYLES
    ===================================================== */
 @media print {
@@ -721,7 +835,6 @@ select { cursor: pointer; appearance: none;
   .main-layout {
     padding: 0.5rem;
     max-width: 100%;
-    grid-template-columns: 1fr;
   }
 
   .viz-panel { gap: 1rem; }
