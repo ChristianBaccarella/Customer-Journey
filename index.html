@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Journey Map Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="16" cy="16" r="16" fill="#3B82F6"/>
+          <path d="M8 20 Q12 10 16 16 Q20 22 24 12" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="8"  cy="20" r="2.5" fill="white"/>
+          <circle cx="16" cy="16" r="2.5" fill="white"/>
+          <circle cx="24" cy="12" r="2.5" fill="white"/>
+        </svg>
+        <span>Customer Journey Map Builder</span>
+      </div>
+      <nav class="header-actions">
+        <button id="btn-reset" class="btn btn-ghost" title="Reset all fields">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.11"/></svg>
+          Reset
+        </button>
+        <button id="btn-print" class="btn btn-ghost" title="Print journey map">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / Export
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <main class="main-layout">
+
+    <!-- ===== FORM PANEL ===== -->
+    <section class="form-panel" aria-label="Customer Journey Input Form">
+      <form id="journey-form" novalidate>
+
+        <!-- PERSONA SECTION -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <span class="section-icon">👤</span> Customer Persona
+          </h2>
+
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label for="customer-name">Customer Name <span class="required">*</span></label>
+              <input type="text" id="customer-name" name="customerName" placeholder="e.g. Sarah Johnson" required />
+              <span class="field-error" aria-live="polite"></span>
+            </div>
+            <div class="form-group">
+              <label for="customer-age">Age <span class="required">*</span></label>
+              <input type="number" id="customer-age" name="customerAge" placeholder="e.g. 34" min="1" max="120" required />
+              <span class="field-error" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customer-occupation">Occupation <span class="required">*</span></label>
+            <input type="text" id="customer-occupation" name="customerOccupation" placeholder="e.g. Marketing Manager" required />
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="customer-bio">Short Bio / Background</label>
+            <textarea id="customer-bio" name="customerBio" rows="3" placeholder="Brief background about this customer..."></textarea>
+          </div>
+        </div>
+
+        <!-- GOALS & PAIN POINTS -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <span class="section-icon">🎯</span> Goals &amp; Pain Points
+          </h2>
+
+          <div class="form-group">
+            <label for="customer-goals">Goals <span class="required">*</span></label>
+            <textarea id="customer-goals" name="customerGoals" rows="3" placeholder="What does the customer want to achieve?" required></textarea>
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="customer-pain">Pain Points <span class="required">*</span></label>
+            <textarea id="customer-pain" name="customerPain" rows="3" placeholder="What frustrations and challenges does the customer face?" required></textarea>
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <!-- JOURNEY STAGES -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <span class="section-icon">🗺️</span> Journey Stages
+          </h2>
+          <p class="section-subtitle">Fill in details for each stage of the customer journey.</p>
+
+          <!-- Stage 1: Awareness -->
+          <div class="stage-block" data-stage="0">
+            <div class="stage-header">
+              <span class="stage-number">1</span>
+              <div>
+                <h3 class="stage-name">Awareness</h3>
+                <p class="stage-desc">How the customer first learns about the product/service</p>
+              </div>
+            </div>
+            <div class="stage-fields">
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s0-touchpoints">Touchpoints</label>
+                  <input type="text" id="s0-touchpoints" name="s0-touchpoints" placeholder="e.g. Social media ad" />
+                </div>
+                <div class="form-group">
+                  <label for="s0-actions">Customer Actions</label>
+                  <input type="text" id="s0-actions" name="s0-actions" placeholder="e.g. Sees ad, clicks link" />
+                </div>
+              </div>
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s0-emotion">Emotion Level</label>
+                  <div class="emotion-slider-wrap">
+                    <input type="range" id="s0-emotion" name="s0-emotion" class="emotion-slider" min="1" max="5" value="3" />
+                    <div class="emotion-labels">
+                      <span>😤 Frustrated</span>
+                      <span>😐 Neutral</span>
+                      <span>😄 Delighted</span>
+                    </div>
+                    <div class="emotion-value-display" id="s0-emotion-display">3 — Neutral</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="s0-channel">Channel</label>
+                  <select id="s0-channel" name="s0-channel">
+                    <option value="Online">Online</option>
+                    <option value="In-Store">In-Store</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Social Media">Social Media</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="s0-opportunities">Opportunities for Improvement</label>
+                <textarea id="s0-opportunities" name="s0-opportunities" rows="2" placeholder="What could be improved at this stage?"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 2: Consideration -->
+          <div class="stage-block" data-stage="1">
+            <div class="stage-header">
+              <span class="stage-number">2</span>
+              <div>
+                <h3 class="stage-name">Consideration</h3>
+                <p class="stage-desc">How the customer evaluates options</p>
+              </div>
+            </div>
+            <div class="stage-fields">
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s1-touchpoints">Touchpoints</label>
+                  <input type="text" id="s1-touchpoints" name="s1-touchpoints" placeholder="e.g. Website visit, reviews" />
+                </div>
+                <div class="form-group">
+                  <label for="s1-actions">Customer Actions</label>
+                  <input type="text" id="s1-actions" name="s1-actions" placeholder="e.g. Reads reviews, compares" />
+                </div>
+              </div>
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s1-emotion">Emotion Level</label>
+                  <div class="emotion-slider-wrap">
+                    <input type="range" id="s1-emotion" name="s1-emotion" class="emotion-slider" min="1" max="5" value="3" />
+                    <div class="emotion-labels">
+                      <span>😤 Frustrated</span>
+                      <span>😐 Neutral</span>
+                      <span>😄 Delighted</span>
+                    </div>
+                    <div class="emotion-value-display" id="s1-emotion-display">3 — Neutral</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="s1-channel">Channel</label>
+                  <select id="s1-channel" name="s1-channel">
+                    <option value="Online">Online</option>
+                    <option value="In-Store">In-Store</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Social Media">Social Media</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="s1-opportunities">Opportunities for Improvement</label>
+                <textarea id="s1-opportunities" name="s1-opportunities" rows="2" placeholder="What could be improved at this stage?"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 3: Purchase / Decision -->
+          <div class="stage-block" data-stage="2">
+            <div class="stage-header">
+              <span class="stage-number">3</span>
+              <div>
+                <h3 class="stage-name">Purchase / Decision</h3>
+                <p class="stage-desc">The buying or commitment moment</p>
+              </div>
+            </div>
+            <div class="stage-fields">
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s2-touchpoints">Touchpoints</label>
+                  <input type="text" id="s2-touchpoints" name="s2-touchpoints" placeholder="e.g. Checkout page" />
+                </div>
+                <div class="form-group">
+                  <label for="s2-actions">Customer Actions</label>
+                  <input type="text" id="s2-actions" name="s2-actions" placeholder="e.g. Adds to cart, pays" />
+                </div>
+              </div>
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s2-emotion">Emotion Level</label>
+                  <div class="emotion-slider-wrap">
+                    <input type="range" id="s2-emotion" name="s2-emotion" class="emotion-slider" min="1" max="5" value="3" />
+                    <div class="emotion-labels">
+                      <span>😤 Frustrated</span>
+                      <span>😐 Neutral</span>
+                      <span>😄 Delighted</span>
+                    </div>
+                    <div class="emotion-value-display" id="s2-emotion-display">3 — Neutral</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="s2-channel">Channel</label>
+                  <select id="s2-channel" name="s2-channel">
+                    <option value="Online">Online</option>
+                    <option value="In-Store">In-Store</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Social Media">Social Media</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="s2-opportunities">Opportunities for Improvement</label>
+                <textarea id="s2-opportunities" name="s2-opportunities" rows="2" placeholder="What could be improved at this stage?"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 4: Retention / Experience -->
+          <div class="stage-block" data-stage="3">
+            <div class="stage-header">
+              <span class="stage-number">4</span>
+              <div>
+                <h3 class="stage-name">Retention / Experience</h3>
+                <p class="stage-desc">Post-purchase usage and experience</p>
+              </div>
+            </div>
+            <div class="stage-fields">
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s3-touchpoints">Touchpoints</label>
+                  <input type="text" id="s3-touchpoints" name="s3-touchpoints" placeholder="e.g. Customer support call" />
+                </div>
+                <div class="form-group">
+                  <label for="s3-actions">Customer Actions</label>
+                  <input type="text" id="s3-actions" name="s3-actions" placeholder="e.g. Uses product, contacts support" />
+                </div>
+              </div>
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s3-emotion">Emotion Level</label>
+                  <div class="emotion-slider-wrap">
+                    <input type="range" id="s3-emotion" name="s3-emotion" class="emotion-slider" min="1" max="5" value="3" />
+                    <div class="emotion-labels">
+                      <span>😤 Frustrated</span>
+                      <span>😐 Neutral</span>
+                      <span>😄 Delighted</span>
+                    </div>
+                    <div class="emotion-value-display" id="s3-emotion-display">3 — Neutral</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="s3-channel">Channel</label>
+                  <select id="s3-channel" name="s3-channel">
+                    <option value="Online">Online</option>
+                    <option value="In-Store">In-Store</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Social Media">Social Media</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="s3-opportunities">Opportunities for Improvement</label>
+                <textarea id="s3-opportunities" name="s3-opportunities" rows="2" placeholder="What could be improved at this stage?"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 5: Advocacy / Loyalty -->
+          <div class="stage-block" data-stage="4">
+            <div class="stage-header">
+              <span class="stage-number">5</span>
+              <div>
+                <h3 class="stage-name">Advocacy / Loyalty</h3>
+                <p class="stage-desc">When the customer becomes a promoter</p>
+              </div>
+            </div>
+            <div class="stage-fields">
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s4-touchpoints">Touchpoints</label>
+                  <input type="text" id="s4-touchpoints" name="s4-touchpoints" placeholder="e.g. Referral program, reviews" />
+                </div>
+                <div class="form-group">
+                  <label for="s4-actions">Customer Actions</label>
+                  <input type="text" id="s4-actions" name="s4-actions" placeholder="e.g. Refers friends, leaves review" />
+                </div>
+              </div>
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="s4-emotion">Emotion Level</label>
+                  <div class="emotion-slider-wrap">
+                    <input type="range" id="s4-emotion" name="s4-emotion" class="emotion-slider" min="1" max="5" value="3" />
+                    <div class="emotion-labels">
+                      <span>😤 Frustrated</span>
+                      <span>😐 Neutral</span>
+                      <span>😄 Delighted</span>
+                    </div>
+                    <div class="emotion-value-display" id="s4-emotion-display">3 — Neutral</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="s4-channel">Channel</label>
+                  <select id="s4-channel" name="s4-channel">
+                    <option value="Online">Online</option>
+                    <option value="In-Store">In-Store</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Social Media">Social Media</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="s4-opportunities">Opportunities for Improvement</label>
+                <textarea id="s4-opportunities" name="s4-opportunities" rows="2" placeholder="What could be improved at this stage?"></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /journey stages -->
+
+        <!-- SUBMIT -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-generate">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Generate Journey Map
+          </button>
+        </div>
+
+      </form>
+    </section><!-- /form-panel -->
+
+    <!-- ===== VISUALIZATION PANEL ===== -->
+    <section id="visualization" class="viz-panel hidden" aria-label="Journey Map Visualization" aria-live="polite">
+
+      <div class="viz-header">
+        <h2 class="viz-title">Customer Journey Map</h2>
+        <p class="viz-subtitle" id="viz-subtitle"></p>
+      </div>
+
+      <!-- Persona Card -->
+      <div class="persona-card" id="persona-card">
+        <div class="persona-avatar" id="persona-avatar" aria-hidden="true"></div>
+        <div class="persona-info">
+          <h3 id="persona-name"></h3>
+          <p class="persona-meta" id="persona-meta"></p>
+          <p class="persona-bio" id="persona-bio"></p>
+          <div class="persona-goals-pain">
+            <div class="goal-block">
+              <strong>🎯 Goals</strong>
+              <p id="persona-goals"></p>
+            </div>
+            <div class="pain-block">
+              <strong>⚡ Pain Points</strong>
+              <p id="persona-pain"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emotion Curve Chart -->
+      <div class="chart-section">
+        <h3 class="chart-title">Emotion Curve</h3>
+        <div class="chart-wrap">
+          <canvas id="emotion-chart" aria-label="Emotion curve chart showing customer emotional state across journey stages"></canvas>
+        </div>
+      </div>
+
+      <!-- Journey Timeline -->
+      <div class="journey-timeline" id="journey-timeline" role="list" aria-label="Journey stages"></div>
+
+    </section><!-- /viz-panel -->
+
+  </main><!-- /main-layout -->
+
+  <footer class="site-footer">
+    <p>Customer Journey Map Builder &mdash; An educational tool for learning about customer experience design.</p>
+  </footer>
+
+  <script src="js/chart.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
