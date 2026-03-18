@@ -10,21 +10,21 @@
    ===================================================== */
 
 const STAGE_NAMES = [
-  'Awareness',
-  'Consideration',
-  'Purchase / Decision',
-  'Retention / Experience',
-  'Advocacy / Loyalty'
+  'Bewusstsein / Aufmerksamkeit',
+  'Überlegung / Abwägung',
+  'Kauf / Entscheidung',
+  'Bindung / Erfahrung',
+  'Weiterempfehlung / Loyalität'
 ];
 
 const STAGE_ICONS = ['🔍', '⚖️', '🛒', '💡', '📣'];
 
 const EMOTION_LABELS = {
-  1: 'Frustrated',
-  2: 'Anxious',
+  1: 'Frustriert',
+  2: 'Ängstlich',
   3: 'Neutral',
-  4: 'Happy',
-  5: 'Delighted'
+  4: 'Zufrieden',
+  5: 'Begeistert'
 };
 
 const EMOTION_COLORS = {
@@ -51,6 +51,7 @@ const form          = document.getElementById('journey-form');
 const vizPanel      = document.getElementById('visualization');
 const btnReset      = document.getElementById('btn-reset');
 const btnPrint      = document.getElementById('btn-print');
+const btnDownload   = document.getElementById('btn-download');
 const emotionChart  = document.getElementById('emotion-chart');
 const journeyTimeline = document.getElementById('journey-timeline');
 
@@ -94,13 +95,13 @@ function getFieldError(field) {
   const val = field.value.trim();
 
   if (field.required && !val) {
-    return 'This field is required.';
+    return 'Dieses Feld ist erforderlich.';
   }
 
   if (field.type === 'number') {
     const num = Number(val);
     if (!val || isNaN(num) || num < 1 || num > 120) {
-      return 'Please enter a valid age (1–120).';
+      return 'Bitte gib ein gültiges Alter ein (1–120).';
     }
   }
 
@@ -196,11 +197,14 @@ function renderVisualization(data) {
 
   // Subtitle
   document.getElementById('viz-subtitle').textContent =
-    `Journey map for ${data.persona.name} · Generated ${_formatDate(new Date())}`;
+    `Journey Map für ${data.persona.name} · Erstellt am ${_formatDate(new Date())}`;
 
   // Show panel
   vizPanel.classList.remove('hidden');
   vizPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Show download button when visualization is visible
+  if (btnDownload) btnDownload.classList.remove('hidden');
 }
 
 /* ---------- Persona Card ---------- */
@@ -217,7 +221,7 @@ function renderPersonaCard(p) {
   avatarEl.textContent = initials;
 
   document.getElementById('persona-name').textContent  = p.name;
-  document.getElementById('persona-meta').textContent  = `${p.age} years old · ${p.occupation}`;
+  document.getElementById('persona-meta').textContent  = `${p.age} Jahre alt · ${p.occupation}`;
   document.getElementById('persona-bio').textContent   = p.bio || '';
   document.getElementById('persona-goals').textContent = p.goals;
   document.getElementById('persona-pain').textContent  = p.pain;
@@ -247,7 +251,7 @@ function renderTimeline(stages) {
     const card = document.createElement('div');
     card.className = 'stage-card';
     card.setAttribute('role', 'listitem');
-    card.setAttribute('aria-label', `Stage ${i + 1}: ${name}`);
+    card.setAttribute('aria-label', `Phase ${i + 1}: ${name}`);
     card.style.setProperty('--stage-color', color);
 
     card.innerHTML = `
@@ -259,9 +263,9 @@ function renderTimeline(stages) {
         </div>
       </div>
       <div class="stage-card-body">
-        ${_detailRow('Touchpoints',      stage.touchpoints   || '—')}
-        ${_detailRow('Customer Actions', stage.actions       || '—')}
-        ${_detailRow('Channel',          stage.channel       || '—')}
+        ${_detailRow('Berührungspunkte',  stage.touchpoints   || '—')}
+        ${_detailRow('Kundenaktionen',    stage.actions       || '—')}
+        ${_detailRow('Kanal',             stage.channel       || '—')}
         ${stage.opportunities ? _improvementRow(stage.opportunities) : ''}
       </div>
     `;
@@ -285,7 +289,7 @@ function _detailRow(label, value) {
 function _improvementRow(value) {
   return `
     <div class="detail-row">
-      <span class="detail-label">Opportunities</span>
+      <span class="detail-label">Verbesserung</span>
       <span class="detail-value improvement">${_escape(value)}</span>
     </div>`;
 }
@@ -305,7 +309,7 @@ function _emotionEmoji(v) {
 }
 
 function _formatDate(d) {
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 /* =====================================================
@@ -334,6 +338,9 @@ function resetAll() {
   vizPanel.classList.add('hidden');
   journeyTimeline.innerHTML = '';
 
+  // Hide download button
+  if (btnDownload) btnDownload.classList.add('hidden');
+
   // Scroll to top of form
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -353,7 +360,7 @@ form.addEventListener('submit', function(e) {
 
 btnReset.addEventListener('click', function() {
   if (vizPanel.classList.contains('hidden') ||
-      confirm('Reset all fields and clear the journey map?')) {
+      confirm('Alle Felder zurücksetzen und die Journey Map löschen?')) {
     resetAll();
   }
 });
@@ -361,6 +368,40 @@ btnReset.addEventListener('click', function() {
 btnPrint.addEventListener('click', function() {
   window.print();
 });
+
+// Download handler — captures visualization as PNG via html2canvas
+if (btnDownload) {
+  btnDownload.addEventListener('click', async function() {
+    if (vizPanel.classList.contains('hidden')) return;
+
+    const originalHTML = btnDownload.innerHTML;
+    btnDownload.innerHTML = '⏳ Wird erstellt...';
+    btnDownload.disabled = true;
+
+    try {
+      const canvas = await html2canvas(vizPanel, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#F8FAFC'
+      });
+
+      const link = document.createElement('a');
+      const customerName = document.getElementById('customer-name').value.trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zäöüß0-9\-]/gi, '') || 'kunde';
+      link.download = `journey-map-${customerName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('Download fehlgeschlagen:', err);
+      alert('Download fehlgeschlagen. Bitte versuche es erneut.');
+    } finally {
+      btnDownload.innerHTML = originalHTML;
+      btnDownload.disabled = false;
+    }
+  });
+}
 
 // Re-render chart on window resize (debounced)
 let resizeTimer;
