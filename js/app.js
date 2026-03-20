@@ -379,6 +379,12 @@ if (btnDownload) {
     btnDownload.disabled = true;
 
     try {
+      if (typeof html2canvas === 'undefined') {
+        throw new Error('html2canvas-Bibliothek konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.');
+      }
+      if (typeof window.jspdf === 'undefined') {
+        throw new Error('jsPDF-Bibliothek konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.');
+      }
       const canvas = await html2canvas(vizPanel, {
         scale: 2,
         useCORS: true,
