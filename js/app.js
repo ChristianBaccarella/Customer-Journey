@@ -378,10 +378,6 @@ if (btnDownload) {
     btnDownload.innerHTML = '⏳ PDF wird erstellt...';
     btnDownload.disabled = true;
 
-    // Store original styles to restore later
-    const vizTitle = document.querySelector('.viz-title');
-    let originalTitleStyles = null;
-
     try {
       if (typeof html2canvas === 'undefined') {
         throw new Error('html2canvas-Bibliothek nicht geladen.');
@@ -395,123 +391,194 @@ if (btnDownload) {
         await document.fonts.ready;
       }
 
-      // Temporarily fix gradient text — html2canvas cannot render background-clip:text
-      if (vizTitle) {
-        originalTitleStyles = {
-          backgroundImage: vizTitle.style.backgroundImage,
-          webkitBackgroundClip: vizTitle.style.webkitBackgroundClip,
-          backgroundClip: vizTitle.style.backgroundClip,
-          webkitTextFillColor: vizTitle.style.webkitTextFillColor,
-          color: vizTitle.style.color
-        };
-        vizTitle.style.backgroundImage = 'none';
-        vizTitle.style.webkitBackgroundClip = 'unset';
-        vizTitle.style.backgroundClip = 'unset';
-        vizTitle.style.webkitTextFillColor = 'unset';
-        vizTitle.style.color = '#1E293B';
-      }
-
-      // Temporarily apply explicit inline styles to strategy sections
-      const strategySections = document.querySelectorAll('#visualization .strategy-section');
-      const strategyLabels = document.querySelectorAll('#visualization .strategy-label');
-      const strategyValues = document.querySelectorAll('#visualization .strategy-value');
-
-      strategySections.forEach(function(el) {
-        el.style.display = 'block';
-        el.style.marginTop = '0.5rem';
-        el.style.background = '#FFF7ED';
-        el.style.border = '1px solid #FED7AA';
-        el.style.borderLeft = '4px solid #F97316';
-        el.style.borderRadius = '0 6px 6px 0';
-        el.style.padding = '0.5rem 0.625rem';
-      });
-
-      strategyLabels.forEach(function(el) {
-        el.style.display = 'block';
-        el.style.fontSize = '0.68rem';
-        el.style.fontWeight = '700';
-        el.style.color = '#C2410C';
-        el.style.textTransform = 'uppercase';
-        el.style.letterSpacing = '0.06em';
-        el.style.marginBottom = '0.25rem';
-      });
-
-      strategyValues.forEach(function(el) {
-        el.style.display = 'block';
-        el.style.fontSize = '0.8rem';
-        el.style.color = '#431407';
-        el.style.lineHeight = '1.45';
-      });
-
       const canvas = await html2canvas(vizPanel, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         backgroundColor: '#F8FAFC',
-        logging: false
+        windowWidth: vizPanel.scrollWidth,
+        windowHeight: vizPanel.scrollHeight,
+        onclone: function(clonedDoc) {
+          // Fix gradient text — html2canvas cannot render background-clip:text
+          clonedDoc.querySelectorAll('.viz-title').forEach(function(el) {
+            el.style.backgroundImage = 'none';
+            el.style.webkitBackgroundClip = 'unset';
+            el.style.backgroundClip = 'unset';
+            el.style.webkitTextFillColor = 'unset';
+            el.style.color = '#1E293B';
+          });
+
+          clonedDoc.querySelectorAll('.viz-subtitle').forEach(function(el) {
+            el.style.fontSize = '0.9rem';
+            el.style.color = '#64748B';
+          });
+
+          // Stage cards
+          clonedDoc.querySelectorAll('.stage-card').forEach(function(el) {
+            el.style.background = 'white';
+            el.style.border = '1px solid #E2E8F0';
+            el.style.borderRadius = '12px';
+            el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+            el.style.overflow = 'hidden';
+          });
+
+          clonedDoc.querySelectorAll('.stage-card-header').forEach(function(el) {
+            el.style.padding = '0.75rem 1rem';
+            el.style.display = 'flex';
+            el.style.alignItems = 'center';
+            el.style.gap = '0.5rem';
+          });
+
+          clonedDoc.querySelectorAll('.stage-card-dot').forEach(function(el) {
+            el.style.width = '1.5rem';
+            el.style.height = '1.5rem';
+            el.style.borderRadius = '50%';
+            el.style.display = 'flex';
+            el.style.alignItems = 'center';
+            el.style.justifyContent = 'center';
+            el.style.color = 'white';
+            el.style.fontWeight = 'bold';
+          });
+
+          clonedDoc.querySelectorAll('.stage-card-emotion-badge').forEach(function(el) {
+            el.style.display = 'inline-flex';
+            el.style.alignItems = 'center';
+            el.style.gap = '0.25rem';
+            el.style.padding = '0.2rem 0.6rem';
+            el.style.borderRadius = '999px';
+            el.style.fontSize = '0.75rem';
+            el.style.fontWeight = '600';
+            el.style.color = 'white';
+          });
+
+          clonedDoc.querySelectorAll('.stage-card-body').forEach(function(el) {
+            el.style.padding = '0.75rem 1rem';
+            el.style.borderTop = '1px solid #F1F5F9';
+            el.style.display = 'flex';
+            el.style.flexDirection = 'column';
+            el.style.gap = '0.5rem';
+          });
+
+          clonedDoc.querySelectorAll('.stage-card-title').forEach(function(el) {
+            el.style.fontSize = '0.85rem';
+            el.style.fontWeight = '700';
+            el.style.color = '#1E293B';
+          });
+
+          // Strategy sections
+          clonedDoc.querySelectorAll('.strategy-section').forEach(function(el) {
+            el.style.display = 'block';
+            el.style.marginTop = '0.5rem';
+            el.style.background = '#FFF7ED';
+            el.style.border = '1px solid #FED7AA';
+            el.style.borderLeft = '4px solid #F97316';
+            el.style.borderRadius = '0 6px 6px 0';
+            el.style.padding = '0.5rem 0.625rem';
+          });
+
+          clonedDoc.querySelectorAll('.strategy-label').forEach(function(el) {
+            el.style.display = 'block';
+            el.style.fontSize = '0.68rem';
+            el.style.fontWeight = '700';
+            el.style.color = '#C2410C';
+            el.style.textTransform = 'uppercase';
+            el.style.letterSpacing = '0.06em';
+            el.style.marginBottom = '0.25rem';
+          });
+
+          clonedDoc.querySelectorAll('.strategy-value').forEach(function(el) {
+            el.style.display = 'block';
+            el.style.fontSize = '0.8rem';
+            el.style.color = '#431407';
+            el.style.lineHeight = '1.45';
+          });
+
+          // Persona card
+          clonedDoc.querySelectorAll('.persona-card').forEach(function(el) {
+            el.style.background = 'white';
+            el.style.border = '1px solid #E2E8F0';
+            el.style.borderRadius = '12px';
+            el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+            el.style.padding = '1rem';
+          });
+
+          clonedDoc.querySelectorAll('.persona-avatar').forEach(function(el) {
+            el.style.width = '3rem';
+            el.style.height = '3rem';
+            el.style.borderRadius = '50%';
+            el.style.background = '#3B82F6';
+            el.style.color = 'white';
+            el.style.display = 'flex';
+            el.style.alignItems = 'center';
+            el.style.justifyContent = 'center';
+            el.style.fontWeight = '700';
+          });
+
+          clonedDoc.querySelectorAll('.persona-goals-pain').forEach(function(el) {
+            el.style.display = 'grid';
+            el.style.gridTemplateColumns = '1fr 1fr';
+            el.style.gap = '0.75rem';
+          });
+
+          clonedDoc.querySelectorAll('.goal-block').forEach(function(el) {
+            el.style.background = '#F0FDF4';
+            el.style.borderRadius = '8px';
+            el.style.padding = '0.75rem';
+          });
+
+          clonedDoc.querySelectorAll('.pain-block').forEach(function(el) {
+            el.style.background = '#FFF1F2';
+            el.style.borderRadius = '8px';
+            el.style.padding = '0.75rem';
+          });
+
+          // Chart section
+          clonedDoc.querySelectorAll('.chart-section').forEach(function(el) {
+            el.style.background = 'white';
+            el.style.border = '1px solid #E2E8F0';
+            el.style.borderRadius = '12px';
+            el.style.padding = '1rem';
+          });
+
+          // Journey timeline grid
+          clonedDoc.querySelectorAll('.journey-timeline').forEach(function(el) {
+            el.style.display = 'grid';
+            el.style.gridTemplateColumns = 'repeat(5, 1fr)';
+            el.style.gap = '0.75rem';
+          });
+        }
       });
 
       const imgData = canvas.toDataURL('image/png');
-      const canvasW = canvas.width;
-      const canvasH = canvas.height;
 
-      if (!canvasW || !canvasH) {
+      if (!canvas.width || !canvas.height) {
         throw new Error('Canvas hat keine gültige Größe.');
       }
 
       const { jsPDF } = window.jspdf;
-
-      // Use landscape for wide journey map layout
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
       });
 
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 10;
-      const usableW = pageW - 2 * margin;
-      const usableH = pageH - 2 * margin;
+      const availableWidth = pageWidth - 2 * margin;
+      const availableHeight = pageHeight - 2 * margin;
 
-      // Scale to fit width
-      const scale = usableW / canvasW;
-      const scaledH = canvasH * scale;
+      const widthRatio = availableWidth / canvas.width;
+      const heightRatio = availableHeight / canvas.height;
+      const ratio = Math.min(widthRatio, heightRatio);
 
-      if (scaledH <= usableH) {
-        // Fits on one page — center vertically
-        const yOffset = margin + (usableH - scaledH) / 2;
-        pdf.addImage(imgData, 'PNG', margin, yOffset, usableW, scaledH);
-      } else {
-        // Multi-page: slice canvas into page-sized chunks
-        // scale = usableW(mm) / canvasW(px), so usableH(mm) / scale = canvas pixels per page
-        const sliceHeightPx = Math.floor(usableH / scale);
-        let srcY = 0;
-        let pageNum = 0;
+      const finalWidth = canvas.width * ratio;
+      const finalHeight = canvas.height * ratio;
 
-        while (srcY < canvasH) {
-          if (pageNum > 0) pdf.addPage();
+      // Center on page
+      const xOffset = margin + (availableWidth - finalWidth) / 2;
+      const yOffset = margin + (availableHeight - finalHeight) / 2;
 
-          const remainingH = canvasH - srcY;
-          const thisSliceH = Math.min(sliceHeightPx, remainingH);
-
-          // Create a slice canvas
-          const sliceCanvas = document.createElement('canvas');
-          sliceCanvas.width = canvasW;
-          sliceCanvas.height = thisSliceH;
-          const sliceCtx = sliceCanvas.getContext('2d');
-          sliceCtx.drawImage(canvas,
-            0, srcY, canvasW, thisSliceH,   // source rect
-            0, 0, canvasW, thisSliceH       // dest rect
-          );
-
-          const sliceImg = sliceCanvas.toDataURL('image/png');
-          const sliceMMH = thisSliceH * scale;
-          pdf.addImage(sliceImg, 'PNG', margin, margin, usableW, sliceMMH);
-
-          srcY += thisSliceH;
-          pageNum++;
-        }
-      }
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
 
       const customerName = document.getElementById('customer-name').value.trim()
         .toLowerCase()
@@ -523,25 +590,6 @@ if (btnDownload) {
       console.error('PDF-Download fehlgeschlagen:', err);
       alert('PDF-Download fehlgeschlagen: ' + err.message);
     } finally {
-      // Restore original viz-title styles
-      if (vizTitle && originalTitleStyles) {
-        vizTitle.style.backgroundImage = originalTitleStyles.backgroundImage;
-        vizTitle.style.webkitBackgroundClip = originalTitleStyles.webkitBackgroundClip;
-        vizTitle.style.backgroundClip = originalTitleStyles.backgroundClip;
-        vizTitle.style.webkitTextFillColor = originalTitleStyles.webkitTextFillColor;
-        vizTitle.style.color = originalTitleStyles.color;
-      }
-
-      // Remove temporary inline styles from strategy elements
-      document.querySelectorAll('#visualization .strategy-section').forEach(function(el) {
-        el.removeAttribute('style');
-      });
-      document.querySelectorAll('#visualization .strategy-label').forEach(function(el) {
-        el.removeAttribute('style');
-      });
-      document.querySelectorAll('#visualization .strategy-value').forEach(function(el) {
-        el.removeAttribute('style');
-      });
 
       btnDownload.innerHTML = originalHTML;
       btnDownload.disabled = false;
