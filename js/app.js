@@ -387,7 +387,7 @@ if (btnDownload) {
         throw new Error('html2canvas-Bibliothek nicht geladen.');
       }
       if (typeof window.jspdf === 'undefined') {
-        throw new Error('jsPDF-Bibliothek nicht geladen.');
+        throw new Error('jsPDF-Bibliothek nicht geladen. Bitte laden Sie die Seite neu und versuchen Sie es erneut.');
       }
 
       // Wait for fonts
