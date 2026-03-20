@@ -288,9 +288,9 @@ function _detailRow(label, value) {
 
 function _improvementRow(value) {
   return `
-    <div class="detail-row">
-      <span class="detail-label">Strategische Optionen</span>
-      <span class="detail-value improvement">${_escape(value)}</span>
+    <div class="strategy-section">
+      <div class="strategy-label">🎯 STRATEGISCHE OPTIONEN</div>
+      <div class="strategy-value">${_escape(value)}</div>
     </div>`;
 }
 
@@ -369,13 +369,13 @@ btnPrint.addEventListener('click', function() {
   window.print();
 });
 
-// Download handler — captures visualization as PNG via html2canvas
+// Download handler — captures visualization as PDF (landscape A4) via html2canvas + jsPDF
 if (btnDownload) {
   btnDownload.addEventListener('click', async function() {
     if (vizPanel.classList.contains('hidden')) return;
 
     const originalHTML = btnDownload.innerHTML;
-    btnDownload.innerHTML = '⏳ Wird erstellt...';
+    btnDownload.innerHTML = '⏳ PDF wird erstellt...';
     btnDownload.disabled = true;
 
     try {
@@ -385,17 +385,44 @@ if (btnDownload) {
         backgroundColor: '#F8FAFC'
       });
 
-      const link = document.createElement('a');
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth  = canvas.width;
+      const imgHeight = canvas.height;
+
+      if (!imgWidth || !imgHeight) {
+        throw new Error('Canvas hat keine gültige Größe.');
+      }
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageWidth  = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin     = 10;
+      const availableWidth  = pageWidth  - 2 * margin;
+      const availableHeight = pageHeight - 2 * margin;
+
+      const ratio     = Math.min(availableWidth / imgWidth, availableHeight / imgHeight);
+
+      const finalWidth  = imgWidth  * ratio;
+      const finalHeight = imgHeight * ratio;
+      const xOffset = margin + (availableWidth  - finalWidth)  / 2;
+      const yOffset = margin + (availableHeight - finalHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+
       const customerName = document.getElementById('customer-name').value.trim()
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-zäöüß0-9\-]/gi, '') || 'kunde';
-      link.download = `journey-map-${customerName}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      pdf.save(`journey-map-${customerName}.pdf`);
     } catch (err) {
-      console.error('Download fehlgeschlagen:', err);
-      alert('Download fehlgeschlagen. Bitte versuche es erneut.');
+      console.error('PDF-Download fehlgeschlagen:', err);
+      alert('PDF-Download fehlgeschlagen. Bitte versuche es erneut.');
     } finally {
       btnDownload.innerHTML = originalHTML;
       btnDownload.disabled = false;
