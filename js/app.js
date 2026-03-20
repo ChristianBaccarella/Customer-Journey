@@ -394,13 +394,184 @@ if (btnDownload) {
         windowWidth: vizPanel.scrollWidth,
         windowHeight: vizPanel.scrollHeight,
         onclone: function(clonedDoc) {
-          // Fix gradient text — html2canvas cannot render background-clip:text
+          var vizClone = clonedDoc.getElementById('visualization');
+          if (!vizClone) return;
+
+          // 1. Set root CSS variables on the cloned document so var() references resolve
+          var root = clonedDoc.documentElement;
+          root.style.setProperty('--color-primary', '#3B82F6');
+          root.style.setProperty('--color-primary-dark', '#2563EB');
+          root.style.setProperty('--color-secondary', '#8B5CF6');
+          root.style.setProperty('--color-bg', '#F8FAFC');
+          root.style.setProperty('--color-surface', '#FFFFFF');
+          root.style.setProperty('--color-border', '#E2E8F0');
+          root.style.setProperty('--color-text', '#1E293B');
+          root.style.setProperty('--color-text-muted', '#64748B');
+          root.style.setProperty('--color-error', '#EF4444');
+          root.style.setProperty('--radius', '10px');
+          root.style.setProperty('--radius-lg', '16px');
+          root.style.setProperty('--shadow-sm', '0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05)');
+          root.style.setProperty('--shadow', '0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04)');
+          root.style.setProperty('--shadow-lg', '0 10px 30px rgba(0,0,0,.1), 0 4px 8px rgba(0,0,0,.06)');
+          root.style.setProperty('--transition', '200ms ease');
+          root.style.setProperty('--font', "'Inter', system-ui, -apple-system, sans-serif");
+
+          // 2. Fix gradient text — html2canvas cannot render background-clip:text
           clonedDoc.querySelectorAll('.viz-title').forEach(function(el) {
             el.style.backgroundImage = 'none';
             el.style.webkitBackgroundClip = 'unset';
             el.style.backgroundClip = 'unset';
             el.style.webkitTextFillColor = 'unset';
             el.style.color = '#3B82F6';
+          });
+
+          // 3. Apply explicit inline styles to resolve CSS custom properties for all elements
+
+          // Viz panel background
+          vizClone.style.background = '#F8FAFC';
+
+          // Persona card
+          clonedDoc.querySelectorAll('.persona-card').forEach(function(el) {
+            el.style.background = '#FFFFFF';
+            el.style.border = '1px solid #E2E8F0';
+            el.style.borderRadius = '16px';
+            el.style.boxShadow = '0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04)';
+          });
+
+          // Persona avatar gradient
+          clonedDoc.querySelectorAll('.persona-avatar').forEach(function(el) {
+            el.style.background = 'linear-gradient(135deg, #3B82F6, #8B5CF6)';
+            el.style.color = '#fff';
+            el.style.boxShadow = '0 4px 12px rgba(59,130,246,.3)';
+          });
+
+          // Persona name
+          clonedDoc.querySelectorAll('.persona-info h3').forEach(function(el) {
+            el.style.color = '#1E293B';
+          });
+
+          // Persona meta text
+          clonedDoc.querySelectorAll('.persona-meta').forEach(function(el) {
+            el.style.color = '#64748B';
+          });
+
+          // Persona bio, goals, pain labels
+          clonedDoc.querySelectorAll('.persona-detail-label').forEach(function(el) {
+            el.style.color = '#64748B';
+            el.style.fontWeight = '600';
+          });
+
+          // Persona detail values
+          clonedDoc.querySelectorAll('.persona-detail-value').forEach(function(el) {
+            el.style.color = '#1E293B';
+          });
+
+          // Viz subtitle
+          clonedDoc.querySelectorAll('.viz-subtitle').forEach(function(el) {
+            el.style.color = '#64748B';
+          });
+
+          // Chart section
+          clonedDoc.querySelectorAll('.chart-section').forEach(function(el) {
+            el.style.background = '#FFFFFF';
+            el.style.border = '1px solid #E2E8F0';
+            el.style.borderRadius = '16px';
+            el.style.boxShadow = '0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04)';
+          });
+
+          clonedDoc.querySelectorAll('.chart-title').forEach(function(el) {
+            el.style.color = '#1E293B';
+          });
+
+          // Stage cards
+          clonedDoc.querySelectorAll('.stage-card').forEach(function(el) {
+            el.style.background = '#FFFFFF';
+            el.style.border = '1px solid #E2E8F0';
+            el.style.borderRadius = '16px';
+            el.style.boxShadow = '0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04)';
+            el.style.overflow = 'hidden';
+            el.style.animation = 'none';
+          });
+
+          // Stage card titles
+          clonedDoc.querySelectorAll('.stage-card-title').forEach(function(el) {
+            el.style.color = '#1E293B';
+            el.style.fontWeight = '700';
+          });
+
+          // Stage card body - border top
+          clonedDoc.querySelectorAll('.stage-card-body').forEach(function(el) {
+            el.style.borderTop = '1px solid #E2E8F0';
+          });
+
+          // Detail labels
+          clonedDoc.querySelectorAll('.detail-label').forEach(function(el) {
+            el.style.fontSize = '0.7rem';
+            el.style.fontWeight = '600';
+            el.style.color = '#64748B';
+            el.style.textTransform = 'uppercase';
+            el.style.letterSpacing = '0.05em';
+          });
+
+          // Detail values
+          clonedDoc.querySelectorAll('.detail-value').forEach(function(el) {
+            el.style.fontSize = '0.8rem';
+            el.style.color = '#1E293B';
+          });
+
+          // Strategy sections
+          clonedDoc.querySelectorAll('.strategy-section').forEach(function(el) {
+            el.style.marginTop = '0.5rem';
+            el.style.background = '#FFF7ED';
+            el.style.border = '1px solid #FED7AA';
+            el.style.borderLeft = '4px solid #F97316';
+            el.style.borderRadius = '0 6px 6px 0';
+            el.style.padding = '0.5rem 0.625rem';
+            el.style.display = 'block';
+          });
+
+          clonedDoc.querySelectorAll('.strategy-label').forEach(function(el) {
+            el.style.fontSize = '0.68rem';
+            el.style.fontWeight = '700';
+            el.style.color = '#C2410C';
+            el.style.textTransform = 'uppercase';
+            el.style.letterSpacing = '0.06em';
+            el.style.marginBottom = '0.25rem';
+            el.style.display = 'block';
+          });
+
+          clonedDoc.querySelectorAll('.strategy-value').forEach(function(el) {
+            el.style.fontSize = '0.8rem';
+            el.style.color = '#431407';
+            el.style.lineHeight = '1.45';
+            el.style.display = 'block';
+          });
+
+          // Emotion badge (already has inline background from JS but ensure text color)
+          clonedDoc.querySelectorAll('.stage-card-emotion-badge').forEach(function(el) {
+            el.style.color = '#fff';
+            el.style.fontWeight = '600';
+          });
+
+          // Stage card dot
+          clonedDoc.querySelectorAll('.stage-card-dot').forEach(function(el) {
+            el.style.fontWeight = '700';
+            el.style.color = '#fff';
+          });
+
+          // Timeline section heading if any
+          clonedDoc.querySelectorAll('.timeline-title').forEach(function(el) {
+            el.style.color = '#1E293B';
+          });
+
+          // 4. Force all text inside visualization to be visible
+          var clonedView = clonedDoc.defaultView || window;
+          vizClone.querySelectorAll('*').forEach(function(el) {
+            var computed = clonedView.getComputedStyle(el);
+            var color = computed.color;
+            if (color === 'rgba(0, 0, 0, 0)' || color === 'transparent') {
+              el.style.color = '#1E293B';
+            }
           });
         }
       });
