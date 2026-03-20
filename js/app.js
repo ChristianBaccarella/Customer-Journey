@@ -369,7 +369,7 @@ btnPrint.addEventListener('click', function() {
   window.print();
 });
 
-// Download handler — captures visualization as PDF (portrait A4, multi-page) via html2canvas + jsPDF
+// Download handler — captures visualization as PDF via html2canvas + jsPDF
 if (btnDownload) {
   btnDownload.addEventListener('click', async function() {
     if (vizPanel.classList.contains('hidden')) return;
@@ -378,125 +378,139 @@ if (btnDownload) {
     btnDownload.innerHTML = '⏳ PDF wird erstellt...';
     btnDownload.disabled = true;
 
+    // Store original styles to restore later
+    const vizTitle = document.querySelector('.viz-title');
+    let originalTitleStyles = null;
+
     try {
       if (typeof html2canvas === 'undefined') {
-        throw new Error('html2canvas-Bibliothek konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.');
+        throw new Error('html2canvas-Bibliothek nicht geladen.');
       }
       if (typeof window.jspdf === 'undefined') {
-        throw new Error('jsPDF-Bibliothek konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.');
+        throw new Error('jsPDF-Bibliothek nicht geladen.');
       }
 
-      // Ensure fonts are fully loaded before capturing
-      await document.fonts.ready;
+      // Wait for fonts
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+
+      // Temporarily fix gradient text — html2canvas cannot render background-clip:text
+      if (vizTitle) {
+        originalTitleStyles = {
+          backgroundImage: vizTitle.style.backgroundImage,
+          webkitBackgroundClip: vizTitle.style.webkitBackgroundClip,
+          backgroundClip: vizTitle.style.backgroundClip,
+          webkitTextFillColor: vizTitle.style.webkitTextFillColor,
+          color: vizTitle.style.color
+        };
+        vizTitle.style.backgroundImage = 'none';
+        vizTitle.style.webkitBackgroundClip = 'unset';
+        vizTitle.style.backgroundClip = 'unset';
+        vizTitle.style.webkitTextFillColor = 'unset';
+        vizTitle.style.color = '#1E293B';
+      }
+
+      // Temporarily apply explicit inline styles to strategy sections
+      const strategySections = document.querySelectorAll('#visualization .strategy-section');
+      const strategyLabels = document.querySelectorAll('#visualization .strategy-label');
+      const strategyValues = document.querySelectorAll('#visualization .strategy-value');
+
+      strategySections.forEach(function(el) {
+        el.style.display = 'block';
+        el.style.marginTop = '0.5rem';
+        el.style.background = '#FFF7ED';
+        el.style.border = '1px solid #FED7AA';
+        el.style.borderLeft = '4px solid #F97316';
+        el.style.borderRadius = '0 6px 6px 0';
+        el.style.padding = '0.5rem 0.625rem';
+      });
+
+      strategyLabels.forEach(function(el) {
+        el.style.display = 'block';
+        el.style.fontSize = '0.68rem';
+        el.style.fontWeight = '700';
+        el.style.color = '#C2410C';
+        el.style.textTransform = 'uppercase';
+        el.style.letterSpacing = '0.06em';
+        el.style.marginBottom = '0.25rem';
+      });
+
+      strategyValues.forEach(function(el) {
+        el.style.display = 'block';
+        el.style.fontSize = '0.8rem';
+        el.style.color = '#431407';
+        el.style.lineHeight = '1.45';
+      });
 
       const canvas = await html2canvas(vizPanel, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#F8FAFC',
-        windowWidth: vizPanel.scrollWidth,
-        windowHeight: vizPanel.scrollHeight,
-        onclone: function(clonedDoc) {
-          // Fix gradient text — html2canvas cannot render background-clip:text
-          clonedDoc.querySelectorAll('.viz-title').forEach(function(el) {
-            el.style.backgroundImage = 'none';
-            el.style.webkitBackgroundClip = 'unset';
-            el.style.backgroundClip = 'unset';
-            el.style.webkitTextFillColor = 'unset';
-            el.style.color = '#3B82F6';
-          });
-
-          // Apply explicit inline styles to strategy sections so html2canvas renders them
-          clonedDoc.querySelectorAll('.strategy-section').forEach(function(el) {
-            el.style.marginTop = '0.5rem';
-            el.style.background = '#FFF7ED';
-            el.style.border = '1px solid #FED7AA';
-            el.style.borderLeft = '4px solid #F97316';
-            el.style.borderRadius = '0 6px 6px 0';
-            el.style.padding = '0.5rem 0.625rem';
-            el.style.display = 'block';
-          });
-
-          clonedDoc.querySelectorAll('.strategy-label').forEach(function(el) {
-            el.style.fontSize = '0.68rem';
-            el.style.fontWeight = '700';
-            el.style.color = '#C2410C';
-            el.style.textTransform = 'uppercase';
-            el.style.letterSpacing = '0.06em';
-            el.style.marginBottom = '0.25rem';
-            el.style.display = 'block';
-          });
-
-          clonedDoc.querySelectorAll('.strategy-value').forEach(function(el) {
-            el.style.fontSize = '0.8rem';
-            el.style.color = '#431407';
-            el.style.lineHeight = '1.45';
-            el.style.display = 'block';
-          });
-
-          // Resolve CSS custom properties for detail rows
-          clonedDoc.querySelectorAll('.detail-label').forEach(function(el) {
-            el.style.fontSize = '0.7rem';
-            el.style.fontWeight = '600';
-            el.style.color = '#64748B';
-            el.style.textTransform = 'uppercase';
-            el.style.letterSpacing = '0.05em';
-          });
-
-          clonedDoc.querySelectorAll('.detail-value').forEach(function(el) {
-            el.style.fontSize = '0.8rem';
-            el.style.color = '#1E293B';
-          });
-        }
+        logging: false
       });
 
       const imgData = canvas.toDataURL('image/png');
-      const imgWidth  = canvas.width;
-      const imgHeight = canvas.height;
+      const canvasW = canvas.width;
+      const canvasH = canvas.height;
 
-      if (!imgWidth || !imgHeight) {
+      if (!canvasW || !canvasH) {
         throw new Error('Canvas hat keine gültige Größe.');
       }
 
       const { jsPDF } = window.jspdf;
+
+      // Use landscape for wide journey map layout
       const pdf = new jsPDF({
-        orientation: 'portrait',
+        orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
       });
 
-      const pageWidth  = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin     = 10;
-      const availableWidth  = pageWidth  - 2 * margin;
-      const availableHeight = pageHeight - 2 * margin;
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const usableW = pageW - 2 * margin;
+      const usableH = pageH - 2 * margin;
 
-      // Scale image width to fit the available page width
-      const ratio      = availableWidth / imgWidth;
-      const finalWidth = availableWidth;
+      // Scale to fit width
+      const scale = usableW / canvasW;
+      const scaledH = canvasH * scale;
 
-      // Multi-page support: slice the canvas across pages when content is taller than one page
-      const pageHeightInPx = availableHeight / ratio;
-      let yPosition = 0;
-      let pageIndex = 0;
+      if (scaledH <= usableH) {
+        // Fits on one page — center vertically
+        const yOffset = margin + (usableH - scaledH) / 2;
+        pdf.addImage(imgData, 'PNG', margin, yOffset, usableW, scaledH);
+      } else {
+        // Multi-page: slice canvas into page-sized chunks
+        // scale = usableW(mm) / canvasW(px), so usableH(mm) / scale = canvas pixels per page
+        const sliceHeightPx = Math.floor(usableH / scale);
+        let srcY = 0;
+        let pageNum = 0;
 
-      while (yPosition < imgHeight) {
-        if (pageIndex > 0) {
-          pdf.addPage();
+        while (srcY < canvasH) {
+          if (pageNum > 0) pdf.addPage();
+
+          const remainingH = canvasH - srcY;
+          const thisSliceH = Math.min(sliceHeightPx, remainingH);
+
+          // Create a slice canvas
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvasW;
+          sliceCanvas.height = thisSliceH;
+          const sliceCtx = sliceCanvas.getContext('2d');
+          sliceCtx.drawImage(canvas,
+            0, srcY, canvasW, thisSliceH,   // source rect
+            0, 0, canvasW, thisSliceH       // dest rect
+          );
+
+          const sliceImg = sliceCanvas.toDataURL('image/png');
+          const sliceMMH = thisSliceH * scale;
+          pdf.addImage(sliceImg, 'PNG', margin, margin, usableW, sliceMMH);
+
+          srcY += thisSliceH;
+          pageNum++;
         }
-
-        const sliceHeight = Math.min(pageHeightInPx, imgHeight - yPosition);
-        const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width  = canvas.width;
-        sliceCanvas.height = Math.ceil(sliceHeight);
-        const ctx = sliceCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, -yPosition);
-
-        const sliceData        = sliceCanvas.toDataURL('image/png');
-        const sliceFinalHeight = sliceHeight * ratio;
-        pdf.addImage(sliceData, 'PNG', margin, margin, finalWidth, sliceFinalHeight);
-
-        yPosition += pageHeightInPx;
-        pageIndex++;
       }
 
       const customerName = document.getElementById('customer-name').value.trim()
@@ -504,10 +518,31 @@ if (btnDownload) {
         .replace(/\s+/g, '-')
         .replace(/[^a-zäöüß0-9\-]/gi, '') || 'kunde';
       pdf.save(`journey-map-${customerName}.pdf`);
+
     } catch (err) {
       console.error('PDF-Download fehlgeschlagen:', err);
-      alert('PDF-Download fehlgeschlagen. Bitte versuche es erneut.');
+      alert('PDF-Download fehlgeschlagen: ' + err.message);
     } finally {
+      // Restore original viz-title styles
+      if (vizTitle && originalTitleStyles) {
+        vizTitle.style.backgroundImage = originalTitleStyles.backgroundImage;
+        vizTitle.style.webkitBackgroundClip = originalTitleStyles.webkitBackgroundClip;
+        vizTitle.style.backgroundClip = originalTitleStyles.backgroundClip;
+        vizTitle.style.webkitTextFillColor = originalTitleStyles.webkitTextFillColor;
+        vizTitle.style.color = originalTitleStyles.color;
+      }
+
+      // Remove temporary inline styles from strategy elements
+      document.querySelectorAll('#visualization .strategy-section').forEach(function(el) {
+        el.removeAttribute('style');
+      });
+      document.querySelectorAll('#visualization .strategy-label').forEach(function(el) {
+        el.removeAttribute('style');
+      });
+      document.querySelectorAll('#visualization .strategy-value').forEach(function(el) {
+        el.removeAttribute('style');
+      });
+
       btnDownload.innerHTML = originalHTML;
       btnDownload.disabled = false;
     }
