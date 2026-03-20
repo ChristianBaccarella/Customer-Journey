@@ -369,7 +369,7 @@ btnPrint.addEventListener('click', function() {
   window.print();
 });
 
-// Download handler — captures visualization as PDF (landscape A4) via html2canvas + jsPDF
+// Download handler — captures visualization as PDF (portrait A4, multi-page) via html2canvas + jsPDF
 if (btnDownload) {
   btnDownload.addEventListener('click', async function() {
     if (vizPanel.classList.contains('hidden')) return;
@@ -385,10 +385,68 @@ if (btnDownload) {
       if (typeof window.jspdf === 'undefined') {
         throw new Error('jsPDF-Bibliothek konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.');
       }
+
+      // Ensure fonts are fully loaded before capturing
+      await document.fonts.ready;
+
       const canvas = await html2canvas(vizPanel, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#F8FAFC'
+        backgroundColor: '#F8FAFC',
+        windowWidth: vizPanel.scrollWidth,
+        windowHeight: vizPanel.scrollHeight,
+        onclone: function(clonedDoc) {
+          // Fix gradient text — html2canvas cannot render background-clip:text
+          clonedDoc.querySelectorAll('.viz-title').forEach(function(el) {
+            el.style.backgroundImage = 'none';
+            el.style.webkitBackgroundClip = 'unset';
+            el.style.backgroundClip = 'unset';
+            el.style.webkitTextFillColor = 'unset';
+            el.style.color = '#3B82F6';
+          });
+
+          // Apply explicit inline styles to strategy sections so html2canvas renders them
+          clonedDoc.querySelectorAll('.strategy-section').forEach(function(el) {
+            el.style.marginTop = '0.5rem';
+            el.style.background = '#FFF7ED';
+            el.style.border = '1px solid #FED7AA';
+            el.style.borderLeft = '4px solid #F97316';
+            el.style.borderRadius = '0 6px 6px 0';
+            el.style.padding = '0.5rem 0.625rem';
+            el.style.display = 'block';
+          });
+
+          clonedDoc.querySelectorAll('.strategy-label').forEach(function(el) {
+            el.style.fontSize = '0.68rem';
+            el.style.fontWeight = '700';
+            el.style.color = '#C2410C';
+            el.style.textTransform = 'uppercase';
+            el.style.letterSpacing = '0.06em';
+            el.style.marginBottom = '0.25rem';
+            el.style.display = 'block';
+          });
+
+          clonedDoc.querySelectorAll('.strategy-value').forEach(function(el) {
+            el.style.fontSize = '0.8rem';
+            el.style.color = '#431407';
+            el.style.lineHeight = '1.45';
+            el.style.display = 'block';
+          });
+
+          // Resolve CSS custom properties for detail rows
+          clonedDoc.querySelectorAll('.detail-label').forEach(function(el) {
+            el.style.fontSize = '0.7rem';
+            el.style.fontWeight = '600';
+            el.style.color = '#64748B';
+            el.style.textTransform = 'uppercase';
+            el.style.letterSpacing = '0.05em';
+          });
+
+          clonedDoc.querySelectorAll('.detail-value').forEach(function(el) {
+            el.style.fontSize = '0.8rem';
+            el.style.color = '#1E293B';
+          });
+        }
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -401,7 +459,7 @@ if (btnDownload) {
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({
-        orientation: 'landscape',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
@@ -412,14 +470,34 @@ if (btnDownload) {
       const availableWidth  = pageWidth  - 2 * margin;
       const availableHeight = pageHeight - 2 * margin;
 
-      const ratio     = Math.min(availableWidth / imgWidth, availableHeight / imgHeight);
+      // Scale image width to fit the available page width
+      const ratio      = availableWidth / imgWidth;
+      const finalWidth = availableWidth;
 
-      const finalWidth  = imgWidth  * ratio;
-      const finalHeight = imgHeight * ratio;
-      const xOffset = margin + (availableWidth  - finalWidth)  / 2;
-      const yOffset = margin + (availableHeight - finalHeight) / 2;
+      // Multi-page support: slice the canvas across pages when content is taller than one page
+      const pageHeightInPx = availableHeight / ratio;
+      let yPosition = 0;
+      let pageIndex = 0;
 
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      while (yPosition < imgHeight) {
+        if (pageIndex > 0) {
+          pdf.addPage();
+        }
+
+        const sliceHeight = Math.min(pageHeightInPx, imgHeight - yPosition);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width  = canvas.width;
+        sliceCanvas.height = Math.ceil(sliceHeight);
+        const ctx = sliceCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, -yPosition);
+
+        const sliceData        = sliceCanvas.toDataURL('image/png');
+        const sliceFinalHeight = sliceHeight * ratio;
+        pdf.addImage(sliceData, 'PNG', margin, margin, finalWidth, sliceFinalHeight);
+
+        yPosition += pageHeightInPx;
+        pageIndex++;
+      }
 
       const customerName = document.getElementById('customer-name').value.trim()
         .toLowerCase()
