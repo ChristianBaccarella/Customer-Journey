@@ -369,30 +369,26 @@ btnPrint.addEventListener('click', function() {
   window.print();
 });
 
-// Download handler — captures visualization as PDF via html2canvas + jsPDF
+// Download handler — captures visualization as PNG image
 if (btnDownload) {
   btnDownload.addEventListener('click', async function() {
     if (vizPanel.classList.contains('hidden')) return;
 
     const originalHTML = btnDownload.innerHTML;
-    btnDownload.innerHTML = '⏳ PDF wird erstellt...';
+    btnDownload.innerHTML = '⏳ Bild wird erstellt...';
     btnDownload.disabled = true;
 
     try {
       if (typeof html2canvas === 'undefined') {
-        throw new Error('html2canvas-Bibliothek nicht geladen.');
-      }
-      if (typeof window.jspdf === 'undefined') {
-        throw new Error('jsPDF-Bibliothek nicht geladen. Bitte laden Sie die Seite neu und versuchen Sie es erneut.');
+        throw new Error('html2canvas-Bibliothek konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.');
       }
 
-      // Wait for fonts
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
 
       const canvas = await html2canvas(vizPanel, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
         backgroundColor: '#F8FAFC',
         windowWidth: vizPanel.scrollWidth,
@@ -404,193 +400,24 @@ if (btnDownload) {
             el.style.webkitBackgroundClip = 'unset';
             el.style.backgroundClip = 'unset';
             el.style.webkitTextFillColor = 'unset';
-            el.style.color = '#1E293B';
-          });
-
-          clonedDoc.querySelectorAll('.viz-subtitle').forEach(function(el) {
-            el.style.fontSize = '0.9rem';
-            el.style.color = '#64748B';
-          });
-
-          // Stage cards
-          clonedDoc.querySelectorAll('.stage-card').forEach(function(el) {
-            el.style.background = 'white';
-            el.style.border = '1px solid #E2E8F0';
-            el.style.borderRadius = '12px';
-            el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
-            el.style.overflow = 'hidden';
-          });
-
-          clonedDoc.querySelectorAll('.stage-card-header').forEach(function(el) {
-            el.style.padding = '0.75rem 1rem';
-            el.style.display = 'flex';
-            el.style.alignItems = 'center';
-            el.style.gap = '0.5rem';
-          });
-
-          clonedDoc.querySelectorAll('.stage-card-dot').forEach(function(el) {
-            el.style.width = '1.5rem';
-            el.style.height = '1.5rem';
-            el.style.borderRadius = '50%';
-            el.style.display = 'flex';
-            el.style.alignItems = 'center';
-            el.style.justifyContent = 'center';
-            el.style.color = 'white';
-            el.style.fontWeight = 'bold';
-          });
-
-          clonedDoc.querySelectorAll('.stage-card-emotion-badge').forEach(function(el) {
-            el.style.display = 'inline-flex';
-            el.style.alignItems = 'center';
-            el.style.gap = '0.25rem';
-            el.style.padding = '0.2rem 0.6rem';
-            el.style.borderRadius = '999px';
-            el.style.fontSize = '0.75rem';
-            el.style.fontWeight = '600';
-            el.style.color = 'white';
-          });
-
-          clonedDoc.querySelectorAll('.stage-card-body').forEach(function(el) {
-            el.style.padding = '0.75rem 1rem';
-            el.style.borderTop = '1px solid #F1F5F9';
-            el.style.display = 'flex';
-            el.style.flexDirection = 'column';
-            el.style.gap = '0.5rem';
-          });
-
-          clonedDoc.querySelectorAll('.stage-card-title').forEach(function(el) {
-            el.style.fontSize = '0.85rem';
-            el.style.fontWeight = '700';
-            el.style.color = '#1E293B';
-          });
-
-          // Strategy sections
-          clonedDoc.querySelectorAll('.strategy-section').forEach(function(el) {
-            el.style.display = 'block';
-            el.style.marginTop = '0.5rem';
-            el.style.background = '#FFF7ED';
-            el.style.border = '1px solid #FED7AA';
-            el.style.borderLeft = '4px solid #F97316';
-            el.style.borderRadius = '0 6px 6px 0';
-            el.style.padding = '0.5rem 0.625rem';
-          });
-
-          clonedDoc.querySelectorAll('.strategy-label').forEach(function(el) {
-            el.style.display = 'block';
-            el.style.fontSize = '0.68rem';
-            el.style.fontWeight = '700';
-            el.style.color = '#C2410C';
-            el.style.textTransform = 'uppercase';
-            el.style.letterSpacing = '0.06em';
-            el.style.marginBottom = '0.25rem';
-          });
-
-          clonedDoc.querySelectorAll('.strategy-value').forEach(function(el) {
-            el.style.display = 'block';
-            el.style.fontSize = '0.8rem';
-            el.style.color = '#431407';
-            el.style.lineHeight = '1.45';
-          });
-
-          // Persona card
-          clonedDoc.querySelectorAll('.persona-card').forEach(function(el) {
-            el.style.background = 'white';
-            el.style.border = '1px solid #E2E8F0';
-            el.style.borderRadius = '12px';
-            el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
-            el.style.padding = '1rem';
-          });
-
-          clonedDoc.querySelectorAll('.persona-avatar').forEach(function(el) {
-            el.style.width = '3rem';
-            el.style.height = '3rem';
-            el.style.borderRadius = '50%';
-            el.style.background = '#3B82F6';
-            el.style.color = 'white';
-            el.style.display = 'flex';
-            el.style.alignItems = 'center';
-            el.style.justifyContent = 'center';
-            el.style.fontWeight = '700';
-          });
-
-          clonedDoc.querySelectorAll('.persona-goals-pain').forEach(function(el) {
-            el.style.display = 'grid';
-            el.style.gridTemplateColumns = '1fr 1fr';
-            el.style.gap = '0.75rem';
-          });
-
-          clonedDoc.querySelectorAll('.goal-block').forEach(function(el) {
-            el.style.background = '#F0FDF4';
-            el.style.borderRadius = '8px';
-            el.style.padding = '0.75rem';
-          });
-
-          clonedDoc.querySelectorAll('.pain-block').forEach(function(el) {
-            el.style.background = '#FFF1F2';
-            el.style.borderRadius = '8px';
-            el.style.padding = '0.75rem';
-          });
-
-          // Chart section
-          clonedDoc.querySelectorAll('.chart-section').forEach(function(el) {
-            el.style.background = 'white';
-            el.style.border = '1px solid #E2E8F0';
-            el.style.borderRadius = '12px';
-            el.style.padding = '1rem';
-          });
-
-          // Journey timeline grid
-          clonedDoc.querySelectorAll('.journey-timeline').forEach(function(el) {
-            el.style.display = 'grid';
-            el.style.gridTemplateColumns = 'repeat(5, 1fr)';
-            el.style.gap = '0.75rem';
+            el.style.color = '#3B82F6';
           });
         }
       });
 
-      const imgData = canvas.toDataURL('image/png');
-
-      if (!canvas.width || !canvas.height) {
-        throw new Error('Canvas hat keine gültige Größe.');
-      }
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
-      const availableWidth = pageWidth - 2 * margin;
-      const availableHeight = pageHeight - 2 * margin;
-
-      const widthRatio = availableWidth / canvas.width;
-      const heightRatio = availableHeight / canvas.height;
-      const ratio = Math.min(widthRatio, heightRatio);
-
-      const finalWidth = canvas.width * ratio;
-      const finalHeight = canvas.height * ratio;
-
-      // Center on page
-      const xOffset = margin + (availableWidth - finalWidth) / 2;
-      const yOffset = margin + (availableHeight - finalHeight) / 2;
-
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
-
+      // Create download link
+      const link = document.createElement('a');
       const customerName = document.getElementById('customer-name').value.trim()
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-zäöüß0-9\-]/gi, '') || 'kunde';
-      pdf.save(`journey-map-${customerName}.pdf`);
-
+      link.download = 'journey-map-' + customerName + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     } catch (err) {
-      console.error('PDF-Download fehlgeschlagen:', err);
-      alert('PDF-Download fehlgeschlagen: ' + err.message);
+      console.error('Bild-Download fehlgeschlagen:', err);
+      alert('Bild-Download fehlgeschlagen. Bitte versuche es erneut.');
     } finally {
-
       btnDownload.innerHTML = originalHTML;
       btnDownload.disabled = false;
     }
